@@ -1,0 +1,68 @@
+
+    <html>
+    <head>
+        <title>Lastname Test Report</title>
+        <style>
+            body { font-family: Arial; margin: 40px; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
+            th { background: #f2f2f2; }
+            .pass { color: green; font-weight: bold; }
+            .fail { color: red; font-weight: bold; }
+            img { border: 1px solid #ccc; }
+        </style>
+    </head>
+    <body>
+        <h1>LAST NAME TEST REPORT</h1>
+        <p><b>Thời gian chạy:</b> 27-12-2025 09:11:37</p>
+
+        <table>
+            <tr>
+                <th>TC ID</th>
+                <th>Mô tả</th>
+                <th>Kết quả mong đợi</th>
+                <th>Kết quả thực tế</th>
+                <th>Trạng thái</th>
+                <th>Screenshot</th>
+            </tr>
+            
+        <tr>
+            <td>TC_Email</td>
+            <td>Kiểm tra Email có thể chỉnh sửa không</td>
+            <td>Email không thể chỉnh sửa</td>
+            <td>Trường Email bị khóa</td>
+            <td class="pass">PASS</td>
+            <td><img src="screenshots/TC_Email_20251227_091132.png" width="300"></td>
+        </tr>
+    
+        <tr>
+            <td>TC_5_LN</td>
+            <td>Để trống Last Name</td>
+            <td>Hiển thị thông báo yêu cầu nhập</td>
+            <td>Please fill out this field.</td>
+            <td class="pass">PASS</td>
+            <td><img src="screenshots/TC_5_LN_20251227_091134.png" width="300"></td>
+        </tr>
+    
+        <tr>
+            <td>TC_6_LN</td>
+            <td>Nhập ký tự trắng vào Last Name</td>
+            <td>Không cập nhật thành công</td>
+            <td>Popup success xuất hiện</td>
+            <td class="fail">FAIL</td>
+            <td><img src="screenshots/TC_6_LN_20251227_091135.png" width="300"></td>
+        </tr>
+    
+        <tr>
+            <td>TC_7_LN</td>
+            <td>Nhập Last Name hợp lệ</td>
+            <td>Cập nhật thành công</td>
+            <td>Popup success hiển thị</td>
+            <td class="pass">PASS</td>
+            <td><img src="screenshots/TC_7_LN_20251227_091137.png" width="300"></td>
+        </tr>
+    
+        </table>
+    </body>
+    </html>
+    

@@ -6,14 +6,14 @@ import time
 import os
 import datetime
 
-# ================== CẤU HÌNH ==================
+# ================== CONFIG ==================
 HOME_URL = "https://www.phptravels.net"
 EMAIL = "user@phptravels.com"
 PASSWORD = "demouser"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCREENSHOT_DIR = os.path.join(BASE_DIR, "screenshots")
-REPORT_FILE = os.path.join(BASE_DIR, "Lastname.html")
+REPORT_FILE = os.path.join(BASE_DIR, "State.html")
 
 os.makedirs(SCREENSHOT_DIR, exist_ok=True)
 
@@ -23,7 +23,9 @@ wait = WebDriverWait(driver, 15)
 
 report_rows = []
 
-# ================== HÀM TIỆN ÍCH ==================
+STATE_XPATH = "//input[@name='state']"
+
+# ================== UTILS ==================
 def take_screenshot(tc_id):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{tc_id}_{timestamp}.png"
@@ -31,11 +33,11 @@ def take_screenshot(tc_id):
     driver.save_screenshot(path)
     return f"screenshots/{filename}"
 
-def add_report_row(tc_id, description, expected, actual, status, screenshot):
+def add_report(tc_id, desc, expected, actual, status, screenshot):
     report_rows.append(f"""
         <tr>
             <td>{tc_id}</td>
-            <td>{description}</td>
+            <td>{desc}</td>
             <td>{expected}</td>
             <td>{actual}</td>
             <td class="{status.lower()}">{status}</td>
@@ -48,11 +50,11 @@ def write_report():
     html = f"""
     <html>
     <head>
-        <title>Lastname Test Report</title>
+        <title>State Validation Report</title>
         <style>
             body {{ font-family: Arial; margin: 40px; }}
             table {{ border-collapse: collapse; width: 100%; }}
-            th, td {{ border: 1px solid #ccc; padding: 8px; vertical-align: top; }}
+            th, td {{ border: 1px solid #ccc; padding: 8px; }}
             th {{ background: #f2f2f2; }}
             .pass {{ color: green; font-weight: bold; }}
             .fail {{ color: red; font-weight: bold; }}
@@ -60,7 +62,7 @@ def write_report():
         </style>
     </head>
     <body>
-        <h1>LAST NAME TEST REPORT</h1>
+        <h1>STATE FIELD VALIDATION REPORT</h1>
         <p><b>Thời gian chạy:</b> {now}</p>
 
         <table>
@@ -80,7 +82,7 @@ def write_report():
     with open(REPORT_FILE, "w", encoding="utf-8") as f:
         f.write(html)
 
-# ================== HÀM CHUNG ==================
+# ================== COMMON ==================
 def open_homepage():
     driver.get(HOME_URL)
     wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
@@ -92,142 +94,114 @@ def login():
     driver.find_element(By.ID, "submitBTN").click()
     wait.until(EC.url_contains("dashboard"))
 
-def navigate_to_profile_page():
+def navigate_to_profile():
     wait.until(
         EC.element_to_be_clickable((By.XPATH, "//a[.//span[text()='My Profile']]"))
     ).click()
     wait.until(EC.url_contains("profile"))
 
-def click_update_profile():
+def click_update():
     wait.until(
         EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Update Profile')]"))
     ).click()
     time.sleep(1)
 
-def fill_required_password():
+def fill_password():
     pwd = wait.until(EC.visibility_of_element_located((By.NAME, "password")))
     pwd.clear()
     pwd.send_keys(PASSWORD)
 
 # ================== TEST CASES ==================
-def test_email_readonly():
-    tc_id = "TC_Email"
-    email_input = wait.until(EC.visibility_of_element_located((By.NAME, "email")))
+def TC_23_empty_state():
+    tc = "TC_23"
+    state = wait.until(EC.visibility_of_element_located((By.XPATH, STATE_XPATH)))
+    state.clear()
 
-    readonly = email_input.get_attribute("readonly")
-    disabled = email_input.get_attribute("disabled")
+    fill_password()
+    click_update()
 
-    screenshot = take_screenshot(tc_id)
+    screenshot = take_screenshot(tc)
+    msg = state.get_attribute("validationMessage")
 
-    if readonly or disabled:
-        add_report_row(
-            tc_id,
-            "Kiểm tra Email có thể chỉnh sửa không",
-            "Email không thể chỉnh sửa",
-            "Trường Email bị khóa",
+    if msg:
+        add_report(
+            tc,
+            "Để trống trường State",
+            "Hiển thị thông báo: Vui lòng điền vào trường này",
+            msg,
             "PASS",
             screenshot
         )
     else:
-        add_report_row(
-            tc_id,
-            "Kiểm tra Email có thể chỉnh sửa không",
-            "Email không thể chỉnh sửa",
-            "Email có thể chỉnh sửa",
-            "FAIL",
-            screenshot
-        )
-
-def test_TC5_empty_lastname():
-    tc_id = "TC_5_LN"
-    ln = wait.until(EC.visibility_of_element_located((By.NAME, "last_name")))
-    ln.clear()
-
-    fill_required_password()
-    click_update_profile()
-
-    screenshot = take_screenshot(tc_id)
-    error_msg = ln.get_attribute("validationMessage")
-
-    if error_msg:
-        add_report_row(
-            tc_id,
-            "Để trống Last Name",
-            "Hiển thị thông báo yêu cầu nhập",
-            error_msg,
-            "PASS",
-            screenshot
-        )
-    else:
-        add_report_row(
-            tc_id,
-            "Để trống Last Name",
-            "Hiển thị thông báo yêu cầu nhập",
+        add_report(
+            tc,
+            "Để trống trường State",
+            "Hiển thị thông báo",
             "Không hiển thị thông báo",
             "FAIL",
             screenshot
         )
 
-def test_TC6_space_lastname():
-    tc_id = "TC_6_LN"
-    ln = wait.until(EC.visibility_of_element_located((By.NAME, "last_name")))
-    ln.clear()
-    ln.send_keys("   ")
+def TC_24_space_state():
+    tc = "TC_24"
+    state = wait.until(EC.visibility_of_element_located((By.XPATH, STATE_XPATH)))
+    state.clear()
+    state.send_keys("   ")
 
-    fill_required_password()
-    click_update_profile()
+    fill_password()
+    click_update()
 
-    screenshot = take_screenshot(tc_id)
+    screenshot = take_screenshot(tc)
     popup = driver.find_elements(By.XPATH, "//div[contains(@class,'vt-card') and contains(@class,'success')]")
 
     if popup:
-        add_report_row(
-            tc_id,
-            "Nhập ký tự trắng vào Last Name",
-            "Không cập nhật thành công",
-            "Popup success xuất hiện",
+        add_report(
+            tc,
+            "Nhập toàn ký tự trắng vào State",
+            "Không cho phép update",
+            "Vẫn update thành công",
             "FAIL",
             screenshot
         )
     else:
-        add_report_row(
-            tc_id,
-            "Nhập ký tự trắng vào Last Name",
-            "Không cập nhật thành công",
-            "Không xuất hiện popup",
+        add_report(
+            tc,
+            "Nhập toàn ký tự trắng vào State",
+            "Hiển thị thông báo yêu cầu nhập",
+            "Không update",
             "PASS",
             screenshot
         )
 
-def test_TC7_valid_lastname():
-    tc_id = "TC_7_LN"
-    ln = wait.until(EC.visibility_of_element_located((By.NAME, "last_name")))
-    ln.clear()
-    ln.send_keys("Ali")
+def TC_25_valid_state():
+    tc = "TC_25"
+    state = wait.until(EC.visibility_of_element_located((By.XPATH, STATE_XPATH)))
+    state.clear()
+    state.send_keys("California")
 
-    fill_required_password()
-    click_update_profile()
+    fill_password()
+    click_update()
 
-    screenshot = take_screenshot(tc_id)
+    screenshot = take_screenshot(tc)
 
     try:
         popup = wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH, "//div[contains(@class,'vt-card') and contains(@class,'success')]"))
         )
-        add_report_row(
-            tc_id,
-            "Nhập Last Name hợp lệ",
-            "Cập nhật thành công",
-            "Popup success hiển thị",
+        add_report(
+            tc,
+            "Nhập State hợp lệ",
+            "Hiển thị popup cập nhật thành công",
+            "Popup Information Updated hiển thị",
             "PASS",
             screenshot
         )
     except:
-        add_report_row(
-            tc_id,
-            "Nhập Last Name hợp lệ",
-            "Cập nhật thành công",
+        add_report(
+            tc,
+            "Nhập State hợp lệ",
+            "Hiển thị popup cập nhật thành công",
             "Không xuất hiện popup",
             "FAIL",
             screenshot
@@ -237,12 +211,11 @@ def test_TC7_valid_lastname():
 try:
     open_homepage()
     login()
-    navigate_to_profile_page()
+    navigate_to_profile()
 
-    test_email_readonly()
-    test_TC5_empty_lastname()
-    test_TC6_space_lastname()
-    test_TC7_valid_lastname()
+    TC_23_empty_state()
+    TC_24_space_state()
+    TC_25_valid_state()
 
 finally:
     write_report()

@@ -1,0 +1,59 @@
+
+    <html>
+    <head>
+        <title>City Validation Report</title>
+        <style>
+            body { font-family: Arial; margin: 40px; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #ccc; padding: 8px; }
+            th { background: #f2f2f2; }
+            .pass { color: green; font-weight: bold; }
+            .fail { color: red; font-weight: bold; }
+            img { border: 1px solid #ccc; }
+        </style>
+    </head>
+    <body>
+        <h1>CITY FIELD VALIDATION REPORT</h1>
+        <p><b>Thời gian chạy:</b> 27-12-2025 09:19:47</p>
+
+        <table>
+            <tr>
+                <th>TC ID</th>
+                <th>Mô tả</th>
+                <th>Kết quả mong đợi</th>
+                <th>Kết quả thực tế</th>
+                <th>Trạng thái</th>
+                <th>Screenshot</th>
+            </tr>
+            
+        <tr>
+            <td>TC_26</td>
+            <td>Để trống trường City</td>
+            <td>Hiển thị thông báo: Vui lòng điền vào trường này</td>
+            <td>Please fill out this field.</td>
+            <td class="pass">PASS</td>
+            <td><img src="screenshots/TC_26_20251227_091943.png" width="300"></td>
+        </tr>
+    
+        <tr>
+            <td>TC_27</td>
+            <td>Nhập toàn ký tự trắng vào City</td>
+            <td>Không cho phép update</td>
+            <td>Vẫn update thành công</td>
+            <td class="fail">FAIL</td>
+            <td><img src="screenshots/TC_27_20251227_091945.png" width="300"></td>
+        </tr>
+    
+        <tr>
+            <td>TC_28</td>
+            <td>Nhập City hợp lệ</td>
+            <td>Hiển thị popup cập nhật thành công</td>
+            <td>Popup Information Updated hiển thị</td>
+            <td class="pass">PASS</td>
+            <td><img src="screenshots/TC_28_20251227_091947.png" width="300"></td>
+        </tr>
+    
+        </table>
+    </body>
+    </html>
+    
